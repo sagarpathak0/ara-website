@@ -1,168 +1,254 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { useTheme } from "../ThemeContext";
 
+const VIEW_W = 611.86;
+const VIEW_H = 695.7;
+
+/* -------------------- NODES -------------------- */
 const nodes = [
-  { id: "delhi", name: "Delhi", state: "NCR", top: "18%", left: "29%", online: "2,842", trust: "99.2%", latency: "12ms" },
-  { id: "mumbai", name: "Mumbai", state: "MH", top: "38%", left: "18%", online: "1,240", trust: "98.0%", latency: "18ms" },
-  { id: "bangalore", name: "Bangalore", state: "KA", top: "52%", left: "28%", online: "3,105", trust: "99.8%", latency: "08ms" },
-  { id: "kolkata", name: "Kolkata", state: "WB", top: "28%", left: "42%", online: "892", trust: "94.5%", latency: "22ms", dimmed: true },
-  { id: "hyderabad", name: "Hyderabad", state: "TS", top: "42%", left: "30%", online: "1,560", trust: "98.5%", latency: "15ms", dimmed: true },
+  { id: "delhi", name: "Delhi", state: "NCR", cx: 188, cy: 212, online: 2842, trust: 99.2, latency: 12 },
+  { id: "kolkata", name: "Kolkata", state: "WB", cx: 410, cy: 340, online: 892, trust: 94.5, latency: 22, dimmed: true },
+  { id: "mumbai", name: "Mumbai", state: "MH", cx: 100, cy: 433, online: 1240, trust: 98.0, latency: 18 },
+  { id: "hyderabad", name: "Hyderabad", state: "TS", cx: 219, cy: 465, online: 1560, trust: 98.5, latency: 15, dimmed: true },
+  { id: "bangalore", name: "Bangalore", state: "KA", cx: 200, cy: 562, online: 3105, trust: 99.8, latency: 8 },
 ];
 
-export default function NetworkSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { isMuted } = useTheme();
-  const [rotation, setRotation] = useState({ x: 45, z: -15 });
+function curvePath(x1: number, y1: number, x2: number, y2: number) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  return `M ${x1} ${y1} Q ${mx} ${my - 60} ${x2} ${y2}`;
+}
 
+export default function NetworkSection() {
+  const ref = useRef<HTMLElement | null>(null);
+  const isInView = useInView(ref, { once: true });
+  const { isMuted } = useTheme(); // muted = light mode
+
+  const [rotation, setRotation] = useState({ x: 45, z: -15 });
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  /* -------------------- PARALLAX -------------------- */
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setRotation({ x: 45 + y * 5, z: -15 + x * 5 });
+    const move = (e: MouseEvent) => {
+      setRotation({
+        x: 45 + (e.clientY / window.innerHeight - 0.5) * 5,
+        z: -15 + (e.clientX / window.innerWidth - 0.5) * 5,
+      });
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
   }, []);
 
-  return (
-    <section id="network" className="relative min-h-screen w-full overflow-hidden py-20" ref={ref}>
-      {/* Background layers */}
-      <div className={`absolute inset-0 transition-colors duration-700 ${isMuted ? "bg-[radial-gradient(circle_at_center,rgba(255,78,78,0.05)_0%,transparent_70%)]" : "bg-[radial-gradient(circle_at_center,rgba(255,78,78,0.08)_0%,transparent_70%)]"}`} />
-      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none z-0" />
+  /* -------------------- STATS -------------------- */
+  const stats = useMemo(() => {
+    const totalOnline = nodes.reduce((a, b) => a + b.online, 0);
+    const avgLatency = nodes.reduce((a, b) => a + b.latency, 0) / nodes.length;
+    const avgTrust = nodes.reduce((a, b) => a + b.trust, 0) / nodes.length;
+    const connections = (nodes.length * (nodes.length - 1)) / 2;
 
-      {/* Header */}
-      <motion.header 
-        className="absolute top-4 md:top-8 left-0 w-full px-4 md:px-8 flex justify-between items-start z-40 pointer-events-none"
-        initial={{ y: -30, opacity: 0 }}
+    return {
+      totalOnline,
+      avgLatency: avgLatency.toFixed(1),
+      avgTrust: avgTrust.toFixed(2),
+      connections,
+    };
+  }, []);
+
+  const hoveredNode = nodes.find((n) => n.id === hovered);
+
+  return (
+    <section
+      id="network"
+      ref={ref}
+      className="relative min-h-screen w-full overflow-hidden flex py-10"
+    >
+      {/* ================= BACKGROUND ================= */}
+      <div
+        className={`absolute inset-0 pointer-events-none transition-colors duration-700 ${
+          isMuted
+            ? "bg-[radial-gradient(circle_at_center,rgba(255,78,78,0.06)_0%,transparent_70%)]"
+            : "bg-[radial-gradient(circle_at_center,rgba(255,78,78,0.10)_0%,transparent_70%)]"
+        }`}
+      />
+      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+      {/* ================= HEADER ================= */}
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
         animate={isInView ? { y: 0, opacity: 1 } : {}}
-        transition={{ duration: 0.6 }}
+        className="absolute top-6 left-6 z-30"
       >
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 md:gap-3">
-            <span className="material-symbols-outlined text-[#FF4E4E] text-2xl md:text-3xl animate-pulse">hub</span>
-            <h2 className={`font-display text-lg md:text-2xl tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>
-              Network<span className="text-[#FF4E4E]">Map</span>
-            </h2>
-          </div>
-          <div className={`text-[10px] md:text-xs font-mono tracking-widest pl-8 md:pl-10 hidden sm:block transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-500"}`}>
-            LIVE FEED // DECENTRALIZED PROTOCOL
-          </div>
+        <h2 className={`font-display text-2xl tracking-widest uppercase ${isMuted ? "text-charcoal" : "text-white"}`}>
+          Network<span className="text-[#FF4E4E]">Map</span>
+        </h2>
+        <div className="text-xs tracking-widest font-mono text-gray-500 mt-1">
+          LIVE FEED // DECENTRALIZED
         </div>
       </motion.header>
 
-      {/* 3D Map */}
-      <div className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center overflow-hidden z-10">
+      {/* ================= MAP ================= */}
+      <div className="flex-1 flex items-center justify-center">
         <motion.div
-          className="relative w-[320px] h-[320px] sm:w-[500px] sm:h-[500px] md:w-[700px] md:h-[700px] lg:w-[900px] lg:h-[900px]"
+          className="relative w-full max-w-[900px] aspect-[611.86/695.7]"
           style={{
+            transform: `rotateX(${rotation.x}deg) rotateZ(${rotation.z}deg)`,
             transformStyle: "preserve-3d",
-            transform: `rotateX(${rotation.x}deg) rotateZ(${rotation.z}deg) scale(0.85)`,
-            transition: "transform 0.5s ease-out",
           }}
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={isInView ? { opacity: 1, scale: 0.85 } : {}}
-          transition={{ duration: 1 }}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={isInView ? { opacity: 1, scale: 1 } : {}}
         >
-          {/* India shape */}
-          <svg className={`absolute top-0 left-0 w-full h-full opacity-20 fill-current pointer-events-none transition-colors duration-700 ${isMuted ? "text-gray-400" : "text-gray-600"}`} viewBox="0 0 612 792">
-            <path d="M305,50 C320,60 350,80 360,100 C370,120 400,130 410,150 C420,170 450,180 440,200 C430,220 480,240 470,260 C460,280 440,290 430,310 C420,330 410,350 400,380 C390,410 380,450 360,500 C340,550 320,600 300,650 C280,600 260,550 240,500 C220,450 200,400 180,350 C160,300 120,280 100,250 C80,220 120,200 140,180 C160,160 180,140 200,120 C220,100 250,80 270,60 C290,40 300,45 305,50 Z" />
-          </svg>
-
-          {/* Node points */}
-          {nodes.map((node, index) => (
-            <motion.div
-              key={node.id}
-              className="absolute group"
-              style={{ top: node.top, left: node.left }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={isInView ? { scale: 1, opacity: 1 } : {}}
-              transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
-            >
-              <div className="absolute -inset-4 bg-[#FF4E4E]/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className={`w-2 h-2 rounded-full bg-[#FF4E4E] cursor-pointer transition-all duration-300 shadow-[0_0_15px_#FF4E4E,0_0_30px_#FF4E4E] hover:scale-150 hover:bg-white ${node.dimmed ? "opacity-70 scale-75" : ""}`} />
-              {/* Tooltip */}
-              <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 p-3 rounded w-48 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none z-50 ${isMuted ? "bg-white/90 border border-gray-200" : "glass-panel"}`}>
-                <h3 className={`font-display text-lg uppercase tracking-wider mb-1 ${isMuted ? "text-charcoal" : "text-white"}`}>
-                  {node.name} <span className="text-xs font-ui text-[#FF4E4E]">{node.state}</span>
-                </h3>
-                <div className={`w-full h-px mb-2 ${isMuted ? "bg-gray-200" : "bg-white/20"}`} />
-                <div className={`text-xs font-ui space-y-1 ${isMuted ? "text-gray-600" : "text-gray-300"}`}>
-                  <div className="flex justify-between"><span>Nodes:</span><span className={`font-mono ${isMuted ? "text-charcoal" : "text-white"}`}>{node.online}</span></div>
-                  <div className="flex justify-between"><span>Trust:</span><span className="text-green-500 font-mono">{node.trust}</span></div>
-                  <div className="flex justify-between"><span>Latency:</span><span className="text-[#FF4E4E] font-mono">{node.latency}</span></div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-
-          {/* Connection lines */}
-          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10 overflow-visible">
+          <svg
+            viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+            className="absolute inset-0 w-full h-full"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <defs>
-              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(255,78,78,0)" />
-                <stop offset="50%" stopColor="rgba(255,78,78,0.4)" />
-                <stop offset="100%" stopColor="rgba(255,78,78,0)" />
+              <linearGradient id="flowGrad">
+                <stop offset="0%" stopColor="transparent" />
+                <stop offset="50%" stopColor="#ff4e4e" />
+                <stop offset="100%" stopColor="transparent" />
               </linearGradient>
             </defs>
-            <line x1="29%" y1="18%" x2="18%" y2="38%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" />
-            <line x1="18%" y1="38%" x2="28%" y2="52%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: "1s" }} />
-            <line x1="29%" y1="18%" x2="42%" y2="28%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: "0.5s" }} />
+
+            <image href="/india.svg" width={VIEW_W} height={VIEW_H} opacity={isMuted ? 0.28 : 0.22} />
+
+            {/* Connections */}
+            {nodes.map((a, i) =>
+              nodes.slice(i + 1).map((b, j) => (
+                <g key={`${a.id}-${b.id}`}>
+                  <path
+                    d={curvePath(a.cx, a.cy, b.cx, b.cy)}
+                    stroke={isMuted ? "rgba(255,78,78,0.20)" : "rgba(255,78,78,0.15)"}
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                  <path
+                    d={curvePath(a.cx, a.cy, b.cx, b.cy)}
+                    stroke="url(#flowGrad)"
+                    strokeWidth="1"
+                    fill="none"
+                    strokeDasharray="6 14"
+                    className="network-flow"
+                    style={{ animationDelay: `${(i + j) * 0.35}s` }}
+                  />
+                </g>
+              ))
+            )}
+
+            {/* Nodes */}
+            {nodes.map((n) => (
+              <g key={n.id}>
+                <circle cx={n.cx} cy={n.cy} r={14} fill="rgba(255,78,78,0.2)" />
+                <circle
+                  cx={n.cx}
+                  cy={n.cy}
+                  r={4}
+                  fill="#ff4e4e"
+                  style={{ filter: "drop-shadow(0 0 8px #ff4e4e)", cursor: "pointer" }}
+                  onMouseEnter={() => setHovered(n.id)}
+                  onMouseLeave={() => setHovered(null)}
+                />
+              </g>
+            ))}
           </svg>
+
+          {/* ================= TOOLTIP ================= */}
+          {hoveredNode && (
+            <div
+              className={`absolute z-40 w-48 p-3 rounded pointer-events-none ${
+                isMuted ? "bg-white border border-gray-200 text-charcoal shadow-lg" : "glass-panel text-white"
+              }`}
+              style={{
+                left: `${(hoveredNode.cx / VIEW_W) * 100}%`,
+                top: `${(hoveredNode.cy / VIEW_H) * 100}%`,
+                transform: "translate(-50%, -150%)",
+              }}
+            >
+              <h3 className="font-display uppercase tracking-wider mb-1">
+                {hoveredNode.name}
+                <span className="text-xs text-[#FF4E4E] ml-1">{hoveredNode.state}</span>
+              </h3>
+              <div className={`h-px my-2 ${isMuted ? "bg-gray-200" : "bg-white/20"}`} />
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between"><span>Nodes</span><span className="font-mono">{hoveredNode.online.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span>Trust</span><span className="text-green-600 font-mono">{hoveredNode.trust}%</span></div>
+                <div className="flex justify-between"><span>Latency</span><span className="text-[#FF4E4E] font-mono">{hoveredNode.latency} ms</span></div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
 
-      {/* Mobile stats - horizontal scroll */}
-      <motion.div 
-        className="lg:hidden absolute bottom-4 left-0 w-full px-4 z-40 overflow-x-auto no-scrollbar"
-        initial={{ y: 50, opacity: 0 }}
-        animate={isInView ? { y: 0, opacity: 1 } : {}}
-        transition={{ delay: 0.8, duration: 0.6 }}
-      >
-        <div className="flex gap-3 min-w-max">
-          {[
-            { label: "Nodes", value: "24,892", icon: "dns" },
-            { label: "Alerts", value: "03", icon: "notifications_active" },
-            { label: "Uptime", value: "99.9%", icon: "timer" },
-          ].map((stat) => (
-            <div key={stat.label} className={`p-3 rounded-lg flex-shrink-0 transition-colors duration-700 ${isMuted ? "bg-white/80 border border-gray-200" : "glass-panel"}`}>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#FF4E4E]/70 text-sm">{stat.icon}</span>
-                <div>
-                  <div className={`text-lg font-display transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>{stat.value}</div>
-                  <div className={`text-[8px] uppercase tracking-widest transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-400"}`}>{stat.label}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Stats panel - desktop */}
-      <motion.div 
-        className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-6 z-40 w-64"
-        initial={{ x: 100, opacity: 0 }}
+      {/* ================= STATS PANEL ================= */}
+      <motion.aside
+        initial={{ x: 80, opacity: 0 }}
         animate={isInView ? { x: 0, opacity: 1 } : {}}
-        transition={{ delay: 0.8, duration: 0.6 }}
+        className={`hidden lg:flex w-[320px] flex-col justify-between px-6 py-12 border-l ${
+          isMuted ? "border-gray-200 bg-white/40" : "border-white/10"
+        }`}
       >
-        {[
-          { label: "Total Nodes", value: "24,892", icon: "dns", sub: "+12% this week", subColor: "text-green-500" },
-          { label: "Alerts", value: "03", icon: "notifications_active", sub: "Active Incidents", subColor: "text-[#FF4E4E]" },
-          { label: "Uptime", value: "99.9%", icon: "timer", sub: "Last 30 Days", subColor: "text-gray-500" },
-        ].map((stat) => (
-          <div key={stat.label} className={`p-6 rounded-lg transition-colors duration-700 ${isMuted ? "bg-white/80 border border-gray-200" : "glass-panel hover:border-primary/30"}`}>
-            <div className="flex items-center justify-between mb-2">
-              <h4 className={`font-ui text-xs uppercase tracking-widest transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-400"}`}>{stat.label}</h4>
-              <span className="material-symbols-outlined text-[#FF4E4E]/70 text-sm">{stat.icon}</span>
-            </div>
-            <div className={`text-4xl font-display mb-1 transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>{stat.value}</div>
-            <div className={`text-[10px] ${stat.subColor} flex items-center gap-1`}>{stat.sub}</div>
+        <div className="space-y-6">
+          <h3 className={`text-xs uppercase tracking-widest ${isMuted ? "text-gray-600" : "text-gray-400"}`}>
+            Network Status
+          </h3>
+
+          <Stat label="Total Online Nodes" value={stats.totalOnline.toLocaleString()} muted={isMuted} />
+          <Stat label="Average Latency" value={`${stats.avgLatency} ms`} muted={isMuted} />
+          <Stat label="Average Trust" value={`${stats.avgTrust} %`} muted={isMuted} />
+          <Stat label="Active Connections" value={stats.connections} muted={isMuted} />
+        </div>
+
+        <div className={`p-4 rounded-lg border ${
+          isMuted
+            ? "bg-green-50 border-green-200"
+            : "bg-green-500/10 border-green-500/20"
+        }`}>
+          <div className={`text-sm font-mono ${isMuted ? "text-green-700" : "text-green-400"}`}>
+            ● NETWORK STABLE
           </div>
-        ))}
-      </motion.div>
+          <div className={`text-xs mt-1 ${isMuted ? "text-green-600" : "text-gray-400"}`}>
+            No anomalies detected
+          </div>
+        </div>
+      </motion.aside>
+
+      {/* ================= FLOW ================= */}
+      <style jsx global>{`
+        .network-flow {
+          animation: flow 3s linear infinite;
+          opacity: 0.6;
+        }
+        @keyframes flow {
+          to {
+            stroke-dashoffset: -120;
+          }
+        }
+      `}</style>
     </section>
+  );
+}
+
+/* -------------------- STAT ROW -------------------- */
+function Stat({
+  label,
+  value,
+  muted,
+}: {
+  label: string;
+  value: string | number;
+  muted: boolean;
+}) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className={`text-xs ${muted ? "text-gray-600" : "text-gray-400"}`}>
+        {label}
+      </span>
+      <span className={`text-lg font-mono ${muted ? "text-charcoal" : "text-white"}`}>
+        {value}
+      </span>
+    </div>
   );
 }
