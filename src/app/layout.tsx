@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Anton, Syne, Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import DVDPlayer from "@/components/DVDPlayer";
 import { ThemeProvider } from "@/components/ThemeContext";
 
 const anton = Anton({
@@ -52,6 +53,7 @@ export default function RootLayout({
           {children}
           
           <Navigation />
+          <DVDPlayer />
         </ThemeProvider>
       </body>
     </html>
