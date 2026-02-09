@@ -10,7 +10,44 @@ export default function JoinSection() {
   const { isMuted } = useTheme();
   const [alias, setAlias] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!alias.trim() || !email.trim()) {
+      setStatus({ type: "error", message: "Please fill in all fields" });
+      return;
+    }
+
+    setIsLoading(true);
+    setStatus(null);
+
+    try {
+      const response = await fetch("http://localhost:3001/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: alias, email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus({ type: "success", message: data.message });
+        setAlias("");
+        setEmail("");
+      } else {
+        setStatus({ type: "error", message: data.error });
+      }
+    } catch {
+      setStatus({ type: "error", message: "Connection failed. Please try again later." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section id="join" className="relative min-h-screen w-full overflow-hidden py-24" ref={ref}>
@@ -75,7 +112,27 @@ export default function JoinSection() {
               <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#FF4E4E] rounded-bl-lg" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#FF4E4E] rounded-br-lg" />
 
-              <form className="space-y-8 relative z-10" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-8 relative z-10" onSubmit={handleSubmit}>
+                {/* Status Message */}
+                {status && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-4 rounded-lg border ${
+                      status.type === "success"
+                        ? "bg-green-500/10 border-green-500/30 text-green-400"
+                        : "bg-red-500/10 border-red-500/30 text-red-400"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">
+                        {status.type === "success" ? "check_circle" : "error"}
+                      </span>
+                      <span className="text-sm font-mono">{status.message}</span>
+                    </div>
+                  </motion.div>
+                )}
+
                 <motion.div 
                   className="space-y-3 group"
                   initial={{ y: 20, opacity: 0 }}
@@ -92,6 +149,7 @@ export default function JoinSection() {
                     type="text"
                     value={alias}
                     onChange={(e) => setAlias(e.target.value)}
+                    disabled={isLoading}
                   />
                 </motion.div>
 
@@ -111,55 +169,42 @@ export default function JoinSection() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                   />
                 </motion.div>
 
-                <motion.div 
-                  className="space-y-3 group"
+                <motion.button 
+                  type="submit"
+                  disabled={isLoading}
+                  className={`w-full mt-6 group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#FF4E4E] to-red-900 p-[1px] shadow-[0_0_15px_rgba(153,0,0,0.5)] transition-transform ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]"}`}
                   initial={{ y: 20, opacity: 0 }}
                   animate={isInView ? { y: 0, opacity: 1 } : {}}
                   transition={{ delay: 0.6, duration: 0.5 }}
-                >
-                  <label className="flex items-center gap-2 text-xs font-ui font-bold tracking-[0.15em] text-gray-500 uppercase group-focus-within:text-[#FF4E4E] transition-colors">
-                    <span className="material-symbols-outlined text-sm">hub</span>
-                    Secure The Mesh
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      className={`w-full border rounded-lg px-4 py-3 placeholder-gray-400 font-mono focus:outline-none focus:border-[#FF4E4E] focus:shadow-[0_0_20px_rgba(153,0,0,0.4)] transition-all duration-300 ${isMuted ? "bg-gray-50 border-gray-200 text-charcoal" : "bg-black/40 border-gray-700 text-white"}`}
-                      placeholder="ACCESS KEY"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button type="button" className={`p-3 rounded-lg border transition-colors ${isMuted ? "bg-gray-100 border-gray-200 text-gray-500 hover:text-charcoal" : "bg-charcoal border-gray-700 text-gray-400 hover:text-white"}`}>
-                      <span className="material-symbols-outlined text-sm">key</span>
-                    </button>
-                  </div>
-                </motion.div>
-
-                <motion.button 
-                  className="w-full mt-6 group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#FF4E4E] to-red-900 p-[1px] shadow-[0_0_15px_rgba(153,0,0,0.5)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={isInView ? { y: 0, opacity: 1 } : {}}
-                  transition={{ delay: 0.7, duration: 0.5 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={!isLoading ? { scale: 1.02 } : {}}
+                  whileTap={!isLoading ? { scale: 0.98 } : {}}
                 >
                   <div className={`relative h-full w-full rounded-lg px-6 py-4 transition-colors group-hover:bg-opacity-80 ${isMuted ? "bg-white" : "bg-black"}`}>
                     <div className="flex items-center justify-center gap-3">
-                      <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>
-                        Initiate Uplink
-                      </span>
-                      <span className={`material-symbols-outlined animate-pulse transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>arrow_forward</span>
+                      {isLoading ? (
+                        <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>
+                          Transmitting...
+                        </span>
+                      ) : (
+                        <>
+                          <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>
+                            Initiate Uplink
+                          </span>
+                          <span className={`material-symbols-outlined animate-pulse transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>arrow_forward</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </motion.button>
 
                 <div className="text-center mt-4">
-                  <a className="text-[10px] font-mono text-gray-500 hover:text-[#FF4E4E] transition-colors border-b border-transparent hover:border-[#FF4E4E]" href="#">
-                    ALREADY A NODE? SYNC HERE
-                  </a>
+                  <span className="text-[10px] font-mono text-gray-500">
+                    Newsletter signup • No password required
+                  </span>
                 </div>
               </form>
 
