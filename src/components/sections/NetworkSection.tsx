@@ -36,28 +36,28 @@ export default function NetworkSection() {
 
       {/* Header */}
       <motion.header 
-        className="absolute top-8 left-0 w-full px-8 flex justify-between items-start z-40 pointer-events-none"
+        className="absolute top-4 md:top-8 left-0 w-full px-4 md:px-8 flex justify-between items-start z-40 pointer-events-none"
         initial={{ y: -30, opacity: 0 }}
         animate={isInView ? { y: 0, opacity: 1 } : {}}
         transition={{ duration: 0.6 }}
       >
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[#FF4E4E] text-3xl animate-pulse">hub</span>
-            <h2 className={`font-display text-2xl tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>
+          <div className="flex items-center gap-2 md:gap-3">
+            <span className="material-symbols-outlined text-[#FF4E4E] text-2xl md:text-3xl animate-pulse">hub</span>
+            <h2 className={`font-display text-lg md:text-2xl tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>
               Network<span className="text-[#FF4E4E]">Map</span>
             </h2>
           </div>
-          <div className={`text-xs font-mono tracking-widest pl-10 transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-500"}`}>
+          <div className={`text-[10px] md:text-xs font-mono tracking-widest pl-8 md:pl-10 hidden sm:block transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-500"}`}>
             LIVE FEED // DECENTRALIZED PROTOCOL
           </div>
         </div>
       </motion.header>
 
       {/* 3D Map */}
-      <div className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden z-10">
+      <div className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center overflow-hidden z-10">
         <motion.div
-          className="relative w-[700px] h-[700px] md:w-[900px] md:h-[900px]"
+          className="relative w-[320px] h-[320px] sm:w-[500px] sm:h-[500px] md:w-[700px] md:h-[700px] lg:w-[900px] lg:h-[900px]"
           style={{
             transformStyle: "preserve-3d",
             transform: `rotateX(${rotation.x}deg) rotateZ(${rotation.z}deg) scale(0.85)`,
@@ -115,7 +115,33 @@ export default function NetworkSection() {
         </motion.div>
       </div>
 
-      {/* Stats panel */}
+      {/* Mobile stats - horizontal scroll */}
+      <motion.div 
+        className="lg:hidden absolute bottom-4 left-0 w-full px-4 z-40 overflow-x-auto no-scrollbar"
+        initial={{ y: 50, opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : {}}
+        transition={{ delay: 0.8, duration: 0.6 }}
+      >
+        <div className="flex gap-3 min-w-max">
+          {[
+            { label: "Nodes", value: "24,892", icon: "dns" },
+            { label: "Alerts", value: "03", icon: "notifications_active" },
+            { label: "Uptime", value: "99.9%", icon: "timer" },
+          ].map((stat) => (
+            <div key={stat.label} className={`p-3 rounded-lg flex-shrink-0 transition-colors duration-700 ${isMuted ? "bg-white/80 border border-gray-200" : "glass-panel"}`}>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#FF4E4E]/70 text-sm">{stat.icon}</span>
+                <div>
+                  <div className={`text-lg font-display transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>{stat.value}</div>
+                  <div className={`text-[8px] uppercase tracking-widest transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-400"}`}>{stat.label}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Stats panel - desktop */}
       <motion.div 
         className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-6 z-40 w-64"
         initial={{ x: 100, opacity: 0 }}

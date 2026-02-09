@@ -52,7 +52,7 @@ export default function TechSection() {
 
         {/* Stats */}
         <motion.div 
-          className="grid grid-cols-3 gap-6 mb-16"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12 md:mb-16"
           initial={{ y: 30, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
@@ -120,7 +120,7 @@ export default function TechSection() {
         </motion.div>
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}

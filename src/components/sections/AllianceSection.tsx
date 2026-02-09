@@ -61,7 +61,7 @@ export default function AllianceSection() {
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          <h2 className={`font-display text-5xl md:text-7xl mb-4 uppercase tracking-tight transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>
+          <h2 className={`font-display text-3xl sm:text-5xl md:text-7xl mb-4 uppercase tracking-tight transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-white"}`}>
             <span className="text-[#FF4E4E]">AntiRape</span>Alliance
           </h2>
           <p className={`font-body text-lg md:text-xl font-light leading-relaxed transition-colors duration-700 ${isMuted ? "text-gray-600" : "text-gray-400"}`}>
@@ -72,7 +72,7 @@ export default function AllianceSection() {
 
         {/* CTA Buttons */}
         <motion.div 
-          className="relative z-30 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl"
+          className="relative z-30 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl"
           initial={{ y: 30, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ delay: 0.6, duration: 0.6 }}

@@ -59,12 +59,12 @@ export default function HeroSection() {
       </motion.nav>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-grow flex flex-col justify-center items-center w-full max-w-7xl mx-auto px-4 mt-[-4rem]">
+      <main className="relative z-10 flex-grow flex flex-col justify-center items-center w-full max-w-7xl mx-auto px-4 mt-0 md:mt-[-4rem]">
         {/* Side lines */}
         <div className={`absolute left-6 md:left-16 top-1/4 h-48 w-[1px] bg-gradient-to-b from-transparent to-transparent hidden md:block transition-colors duration-700 ${isMuted ? "via-[#FF4E4E]/30" : "via-white/20"}`} />
         <div className={`absolute right-6 md:right-16 bottom-1/4 h-48 w-[1px] bg-gradient-to-b from-transparent to-transparent hidden md:block transition-colors duration-700 ${isMuted ? "via-[#FF4E4E]/30" : "via-white/20"}`} />
 
-        <div className="relative w-full max-w-5xl h-[55vh] md:h-[65vh] flex items-end justify-center">
+        <div className="relative w-full max-w-5xl h-[45vh] sm:h-[55vh] md:h-[65vh] flex items-end justify-center">
           {/* Image container with frame */}
           <motion.div
             className={`relative overflow-hidden transition-all duration-700 ${
@@ -95,7 +95,7 @@ export default function HeroSection() {
             {isMuted && (
               <div className="absolute inset-0 flex items-center justify-center z-20">
                 <div className="text-center">
-                  <h2 className="font-display text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter text-white leading-[0.85] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                  <h2 className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter text-white leading-[0.85] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
                     Fear Should<br />
                     <span className="italic font-body font-bold text-[#FF4E4E] drop-shadow-[0_0_20px_rgba(255,78,78,0.5)]">Never</span> Define<br />
                     Freedom
@@ -128,7 +128,7 @@ export default function HeroSection() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
             >
-              <h2 className="font-display text-6xl md:text-9xl uppercase tracking-tighter text-white leading-[0.85]">
+              <h2 className="font-display text-4xl sm:text-6xl md:text-9xl uppercase tracking-tighter text-white leading-[0.85]">
                 Fear Should<br />
                 <span className="italic font-body font-bold text-outline">Never</span> Define<br />
                 Freedom

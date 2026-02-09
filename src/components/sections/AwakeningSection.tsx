@@ -108,10 +108,10 @@ export default function AwakeningSection() {
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.8, duration: 0.6 }}
             >
-              <h3 className={`font-display text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter leading-[0.85] ${isMuted ? "text-charcoal/70" : "text-white/80"}`}>
+              <h3 className={`font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl uppercase tracking-tighter leading-[0.85] ${isMuted ? "text-charcoal/70" : "text-white/80"}`}>
                 BREAK THE
               </h3>
-              <h3 className="font-display text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter text-[#FF4E4E] drop-shadow-[0_0_30px_rgba(255,78,78,0.5)]">
+              <h3 className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter text-[#FF4E4E] drop-shadow-[0_0_30px_rgba(255,78,78,0.5)]">
                 SILENCE
               </h3>
             </motion.div>
@@ -127,10 +127,10 @@ export default function AwakeningSection() {
           </motion.div>
           
           {/* Corner frames - positioned at screen edges */}
-          <div className="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
-          <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
-          <div className="absolute bottom-20 left-4 w-16 h-16 border-b-2 border-l-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
-          <div className="absolute bottom-20 right-4 w-16 h-16 border-b-2 border-r-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
+          <div className="absolute top-4 left-4 w-10 h-10 sm:w-16 sm:h-16 border-t-2 border-l-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
+          <div className="absolute top-4 right-4 w-10 h-10 sm:w-16 sm:h-16 border-t-2 border-r-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
+          <div className="absolute bottom-16 sm:bottom-20 left-4 w-10 h-10 sm:w-16 sm:h-16 border-b-2 border-l-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
+          <div className="absolute bottom-16 sm:bottom-20 right-4 w-10 h-10 sm:w-16 sm:h-16 border-b-2 border-r-2 border-[#FF4E4E]/50 pointer-events-none z-30" />
         </motion.div>
       </div>
 
@@ -142,7 +142,7 @@ export default function AwakeningSection() {
         transition={{ delay: 0.6, duration: 0.6 }}
       >
         <div className="border-l-4 border-[#FF4E4E] pl-4">
-          <h2 className={`font-display text-4xl md:text-6xl uppercase tracking-tight leading-[0.9] ${isMuted ? "text-charcoal" : "text-white"}`}>
+          <h2 className={`font-display text-3xl sm:text-4xl md:text-6xl uppercase tracking-tight leading-[0.9] ${isMuted ? "text-charcoal" : "text-white"}`}>
             THE<br />
             <span className="text-[#FF4E4E]">AWAKENING</span>
           </h2>

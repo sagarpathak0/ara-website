@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "./ThemeContext";
 import { useEffect, useState, useRef, useCallback } from "react";
 
@@ -64,22 +64,27 @@ export default function DVDPlayer() {
 
   return (
     <motion.div
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-3"
+      className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-2 md:gap-3"
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 20 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Song name label */}
-      <motion.div
-        className="bg-black/60 backdrop-blur-md border border-white/10 rounded-lg px-4 py-2 max-w-[180px]"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">Now Playing</div>
-        <div className="text-sm text-white font-medium truncate">{songName}</div>
-      </motion.div>
+      {/* Song name label - only visible when playing */}
+      <AnimatePresence>
+        {isPlaying && (
+          <motion.div
+            className="hidden sm:block bg-black/60 backdrop-blur-md border border-white/10 rounded-lg px-3 py-1.5 md:px-4 md:py-2 max-w-[140px] md:max-w-[180px]"
+            initial={{ opacity: 0, x: 40, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 40, scale: 0.8 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <div className="text-[8px] md:text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">Now Playing</div>
+            <div className="text-xs md:text-sm text-white font-medium truncate">{songName}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* DVD disc button with frequency visualizer and volume control */}
       <div 
@@ -270,10 +275,49 @@ export default function DVDPlayer() {
             </div>
           </motion.div>
           
-          {/* Center hole */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-gray-800 to-black border border-white/20 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#FF4E4E]/80" />
-          </div>
+          {/* Center content - switches between hole and song name */}
+          <AnimatePresence mode="wait">
+            {isPlaying ? (
+              /* Center hole when playing */
+              <motion.div 
+                key="hole"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-gray-800 to-black border border-white/20 flex items-center justify-center"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF4E4E]/80" />
+              </motion.div>
+            ) : (
+              /* Song name when paused */
+              <motion.div 
+                key="song"
+                className="absolute inset-2 rounded-full flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                <motion.div 
+                  className="text-[6px] text-[#FF4E4E] uppercase tracking-wider font-bold mb-0.5"
+                  initial={{ y: 5, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  Paused
+                </motion.div>
+                <motion.div 
+                  className="text-[5px] text-white/80 font-medium text-center px-1 leading-tight max-w-[40px] truncate"
+                  initial={{ y: 5, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {songName.split(' - ')[0]}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Play/Pause icon overlay */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/40 rounded-full">

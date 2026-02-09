@@ -13,7 +13,7 @@ export default function HomePage() {
   const { isMuted } = useTheme();
 
   return (
-    <main className="relative">
+    <main className="relative overflow-x-hidden max-w-[100vw]">
       <HeroSection />
       <ManifestoSection />
       <NetworkSection />
@@ -26,7 +26,7 @@ export default function HomePage() {
       <footer className={`relative z-10 py-12 border-t transition-colors duration-700 ${isMuted ? "bg-[#E8E4E0] border-gray-200" : "bg-background-dark border-white/10"}`}>
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className={`text-sm font-mono transition-colors duration-700 ${isMuted ? "text-gray-500" : "text-gray-500"}`}>
-            © 2024 AntiRapeAlliance. Decentralized Safety Protocol.
+            © 2026 AntiRapeAlliance. Decentralized Safety Protocol.
           </div>
           <div className="flex gap-6">
             <a className={`hover:text-[#FF4E4E] transition-colors ${isMuted ? "text-gray-500" : "text-gray-500"}`} href="#">

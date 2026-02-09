@@ -30,7 +30,7 @@ export default function ManifestoSection() {
           >
             <div className={`absolute -left-8 top-0 h-full w-[1px] bg-gradient-to-b from-transparent to-transparent hidden md:block transition-colors duration-700 ${isMuted ? "via-[#FF4E4E]" : "via-primary"}`} />
 
-            <h2 className={`font-display text-6xl md:text-8xl uppercase tracking-tighter leading-[0.85] z-20 transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-off-white"}`}>
+            <h2 className={`font-display text-4xl sm:text-6xl md:text-8xl uppercase tracking-tighter leading-[0.85] z-20 transition-colors duration-700 ${isMuted ? "text-charcoal" : "text-off-white"}`}>
               WE ARE<br />
               THE <span className="text-[#FF4E4E]">SHIELD</span>
             </h2>
@@ -59,16 +59,16 @@ export default function ManifestoSection() {
             </div>
 
             <motion.div 
-              className="flex items-center gap-4 mt-8"
+              className="flex flex-wrap items-center gap-3 md:gap-4 mt-6 md:mt-8"
               initial={{ y: 30, opacity: 0 }}
               animate={isInView ? { y: 0, opacity: 1 } : {}}
               transition={{ delay: 0.8, duration: 0.6 }}
             >
-              <button className={`px-8 py-3 font-ui text-sm font-bold uppercase tracking-widest hover:bg-[#FF4E4E] hover:text-white transition-all duration-300 ${isMuted ? "bg-charcoal text-white" : "bg-white text-charcoal"}`}>
+              <button className={`px-4 md:px-8 py-2 md:py-3 font-ui text-xs md:text-sm font-bold uppercase tracking-widest hover:bg-[#FF4E4E] hover:text-white transition-all duration-300 ${isMuted ? "bg-charcoal text-white" : "bg-white text-charcoal"}`}>
                 Sign The Manifesto
               </button>
-              <div className="h-[1px] w-24 bg-[#FF4E4E]/50" />
-              <span className="font-mono text-xs text-[#FF4E4E]">HASH: #8A2F99</span>
+              <div className="h-[1px] w-12 md:w-24 bg-[#FF4E4E]/50 hidden sm:block" />
+              <span className="font-mono text-[10px] md:text-xs text-[#FF4E4E]">HASH: #8A2F99</span>
             </motion.div>
           </motion.div>
         </div>

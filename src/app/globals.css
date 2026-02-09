@@ -15,8 +15,32 @@
 }
 
 @layer base {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
   body {
     @apply font-body transition-colors duration-700;
+  }
+  
+  /* Custom thin scrollbar - base styles */
+  * {
+    scrollbar-width: thin;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    transition: background-color 0.3s;
   }
   
   /* Muted theme (grey/light) */
@@ -32,6 +56,18 @@
     color: var(--theme-text);
   }
   
+  .theme-muted *::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.4);
+  }
+  
+  .theme-muted *::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 100, 100, 0.6);
+  }
+  
+  .theme-muted * {
+    scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+  }
+  
   /* Unmuted theme (red/dark) */
   .theme-unmuted {
     --theme-bg: #0F0F11;
@@ -43,6 +79,18 @@
     --theme-glow: rgba(255, 78, 78, 0.4);
     background-color: var(--theme-bg);
     color: var(--theme-text);
+  }
+  
+  .theme-unmuted *::-webkit-scrollbar-thumb {
+    background: rgba(255, 78, 78, 0.4);
+  }
+  
+  .theme-unmuted *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 78, 78, 0.6);
+  }
+  
+  .theme-unmuted * {
+    scrollbar-color: rgba(255, 78, 78, 0.4) transparent;
   }
 }
 
