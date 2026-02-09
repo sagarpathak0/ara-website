@@ -39,7 +39,7 @@ export default function Navigation() {
           onClick={(e) => handleClick(e, "#home")}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group relative theme-text-secondary hover:theme-text hover:bg-white/10"
         >
-          <span className="material-symbols-outlined text-xl">mail</span>
+          <span className="material-symbols-outlined text-xl">home</span>
         </Link>
         
         <Link
@@ -47,7 +47,7 @@ export default function Navigation() {
           onClick={(e) => handleClick(e, "#manifesto")}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group relative theme-text-secondary hover:theme-text hover:bg-white/10"
         >
-          <span className="material-symbols-outlined text-xl">photo_camera</span>
+          <span className="material-symbols-outlined text-xl">description</span>
         </Link>
 
         {/* Center Mic Toggle - THE MAIN TOGGLE */}
@@ -80,7 +80,7 @@ export default function Navigation() {
           onClick={(e) => handleClick(e, "#tech")}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group relative theme-text-secondary hover:theme-text hover:bg-white/10"
         >
-          <span className="material-symbols-outlined text-xl">tag</span>
+          <span className="material-symbols-outlined text-xl">memory</span>
         </Link>
         
         <Link
@@ -88,7 +88,7 @@ export default function Navigation() {
           onClick={(e) => handleClick(e, "#join")}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group relative theme-text-secondary hover:theme-text hover:bg-white/10"
         >
-          <span className="material-symbols-outlined text-xl">play_arrow</span>
+          <span className="material-symbols-outlined text-xl">person_add</span>
         </Link>
       </div>
     </motion.nav>

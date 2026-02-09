@@ -176,25 +176,26 @@ export default function JoinSection() {
                 <motion.button 
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full mt-6 group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#FF4E4E] to-red-900 p-[1px] shadow-[0_0_15px_rgba(153,0,0,0.5)] transition-transform ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98]"}`}
+                  className={`w-full mt-6 group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#FF4E4E] to-red-900 p-[1px] shadow-[0_0_15px_rgba(153,0,0,0.5)] transition-transform ${isLoading ? "opacity-70 cursor-not-allowed" : "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"}`}
                   initial={{ y: 20, opacity: 0 }}
                   animate={isInView ? { y: 0, opacity: 1 } : {}}
                   transition={{ delay: 0.6, duration: 0.5 }}
                   whileHover={!isLoading ? { scale: 1.02 } : {}}
                   whileTap={!isLoading ? { scale: 0.98 } : {}}
                 >
-                  <div className={`relative h-full w-full rounded-lg px-6 py-4 transition-colors group-hover:bg-opacity-80 ${isMuted ? "bg-white" : "bg-black"}`}>
-                    <div className="flex items-center justify-center gap-3">
+                  <div className={`relative h-full w-full overflow-hidden rounded-lg px-6 py-4 transition-colors group-hover:bg-opacity-80 ${isMuted ? "bg-white" : "bg-black"}`}>
+                    <span className="pointer-events-none absolute inset-0 translate-y-full bg-[#FF4E4E] transition-transform duration-300 ease-out group-hover:translate-y-0" />
+                    <div className="relative z-10 flex items-center justify-center gap-3">
                       {isLoading ? (
-                        <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>
+                        <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E] group-hover:text-black" : "text-white"}`}>
                           Transmitting...
                         </span>
                       ) : (
                         <>
-                          <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>
+                          <span className={`font-ui font-bold tracking-widest uppercase transition-colors duration-700 ${isMuted ? "text-[#FF4E4E] group-hover:text-black" : "text-white"}`}>
                             Initiate Uplink
                           </span>
-                          <span className={`material-symbols-outlined animate-pulse transition-colors duration-700 ${isMuted ? "text-[#FF4E4E]" : "text-white"}`}>arrow_forward</span>
+                          <span className={`material-symbols-outlined animate-pulse transition-colors duration-700 ${isMuted ? "text-[#FF4E4E] group-hover:text-black" : "text-white"}`}>arrow_forward</span>
                         </>
                       )}
                     </div>
