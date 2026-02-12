@@ -111,9 +111,25 @@ export default function NetworkSection() {
                 <stop offset="50%" stopColor="#ff4e4e" />
                 <stop offset="100%" stopColor="transparent" />
               </linearGradient>
+              {/* Glow filter for dark mode */}
+              <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feFlood floodColor="#ff4e4e" floodOpacity="0.4" result="color" />
+                <feComposite in="color" in2="blur" operator="in" result="glow" />
+                <feMerge>
+                  <feMergeNode in="glow" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
 
-            <image href="/india.svg" width={VIEW_W} height={VIEW_H} opacity={isMuted ? 0.28 : 0.22} />
+            <image 
+              href="/india.svg" 
+              width={VIEW_W} 
+              height={VIEW_H} 
+              opacity={isMuted ? 0.28 : 0.5} 
+              filter={isMuted ? "none" : "url(#mapGlow)"}
+            />
 
             {/* Connections */}
             {nodes.map((a, i) =>
@@ -214,6 +230,11 @@ export default function NetworkSection() {
           </div>
         </div>
       </motion.aside>
+
+      {/* ================= DISCLAIMER ================= */}
+      <div className={`absolute bottom-4 right-6 text-[10px] italic ${isMuted ? "text-gray-400" : "text-gray-500"}`}>
+        *Data shown represents projected network growth
+      </div>
 
       {/* ================= FLOW ================= */}
       <style jsx global>{`

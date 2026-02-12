@@ -48,7 +48,7 @@ export default function AlliancePage() {
 
         {/* CTA Buttons */}
         <div className="relative z-30 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-          <button className="group relative px-8 py-5 bg-surface-dark border-2 border-white/20 hover:border-primary transition-all duration-300 overflow-hidden">
+          <a href="/#join" className="group relative px-8 py-5 bg-surface-dark border-2 border-white/20 hover:border-primary transition-all duration-300 overflow-hidden">
             <div className="absolute inset-0 w-0 bg-primary transition-all duration-[250ms] ease-out group-hover:w-full opacity-10" />
             <span className="relative flex items-center justify-between font-display text-xl uppercase tracking-wider text-white group-hover:text-primary transition-colors">
               Join Revolution
@@ -57,15 +57,15 @@ export default function AlliancePage() {
               </span>
             </span>
             <div className="absolute bottom-0 left-0 h-1 w-full bg-white/10 group-hover:bg-primary" />
-          </button>
+          </a>
 
-          <button className="group relative px-8 py-5 bg-primary text-white border-2 border-primary shadow-[0_0_20px_rgba(255,78,78,0.3)] hover:shadow-[0_0_30px_rgba(255,78,78,0.6)] transition-all duration-300 transform hover:-translate-y-1">
+          <a href="/#join" className="group relative px-8 py-5 bg-primary text-white border-2 border-primary shadow-[0_0_20px_rgba(255,78,78,0.3)] hover:shadow-[0_0_30px_rgba(255,78,78,0.6)] transition-all duration-300 transform hover:-translate-y-1">
             <span className="relative flex items-center justify-center font-display text-2xl uppercase tracking-wider">
               Build Network
             </span>
-          </button>
+          </a>
 
-          <button className="group relative px-8 py-5 bg-surface-dark border-2 border-white/20 hover:border-primary transition-all duration-300 overflow-hidden">
+          <a href="/#join" className="group relative px-8 py-5 bg-surface-dark border-2 border-white/20 hover:border-primary transition-all duration-300 overflow-hidden">
             <div className="absolute inset-0 w-0 bg-primary transition-all duration-[250ms] ease-out group-hover:w-full opacity-10" />
             <span className="relative flex items-center justify-between font-display text-xl uppercase tracking-wider text-white group-hover:text-primary transition-colors">
               Empower Safety
@@ -74,7 +74,7 @@ export default function AlliancePage() {
               </span>
             </span>
             <div className="absolute bottom-0 left-0 h-1 w-full bg-white/10 group-hover:bg-primary" />
-          </button>
+          </a>
         </div>
       </div>
 

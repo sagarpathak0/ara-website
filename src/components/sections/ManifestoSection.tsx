@@ -43,12 +43,12 @@ export default function ManifestoSection() {
               ].map((protocol, index) => (
                 <motion.div 
                   key={protocol.title}
-                  className={`p-4 border-l-2 cursor-default transition-all duration-300 hover:skew-x-[-10deg] hover:translate-x-[5px] hover:bg-[#FF4E4E] hover:text-white ${isMuted ? "border-[#FF4E4E]/50" : "border-white/20"}`}
+                  className={`group p-4 border-l-2 cursor-default transition-all duration-300 hover:skew-x-[-10deg] hover:translate-x-[5px] hover:bg-[#FF4E4E] hover:text-white ${isMuted ? "border-[#FF4E4E]/50" : "border-white/20"}`}
                   initial={{ x: -50, opacity: 0 }}
                   animate={isInView ? { x: 0, opacity: 1 } : {}}
                   transition={{ delay: 0.2 + index * 0.15, duration: 0.6 }}
                 >
-                  <h3 className="font-ui text-xs font-bold uppercase tracking-widest text-[#FF4E4E] mb-2">
+                  <h3 className="font-ui text-xs font-bold uppercase tracking-widest text-[#FF4E4E] group-hover:text-white mb-2 transition-colors duration-300">
                     {protocol.title}
                   </h3>
                   <p className={`font-body text-sm leading-relaxed transition-colors duration-700 ${isMuted ? "text-gray-600" : "text-gray-300"}`}>
