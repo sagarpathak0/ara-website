@@ -7,6 +7,7 @@ type ThemeContextType = {
   isPlaying: boolean;
   toggleMute: () => void;
   togglePlay: () => void;
+  setTheme: (muted: boolean) => void;
   songName: string;
   analyserRef: React.RefObject<AnalyserNode | null>;
   volume: number;
@@ -19,42 +20,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isMuted, setIsMuted] = useState(true); // Start muted (grey theme)
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(0.2); // 20% volume initially
+  const audioEnabledRef = useRef(false); // Track if user has enabled audio
+  const isMutedRef = useRef(true); // Track current muted state for click handler
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const songName = "Drip - Corbin Roe";
 
+  // Keep refs in sync with state
   useEffect(() => {
-    // Create audio element on client side
-    audioRef.current = new Audio("/Drip - Corbin Roe, Mayne & NicXIX.mp3");
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.2; // 20% volume initially
-    audioRef.current.crossOrigin = "anonymous";
-    
-    // Add event listeners for play state
-    const audio = audioRef.current;
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handlePause);
-    
-    return () => {
-      if (audio) {
-        audio.removeEventListener("play", handlePlay);
-        audio.removeEventListener("pause", handlePause);
-        audio.pause();
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
-      audioRef.current = null;
-      audioContextRef.current = null;
-      analyserRef.current = null;
-      sourceRef.current = null;
-    };
-  }, []);
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
 
   // Initialize Web Audio API for frequency analysis
   const initAudioContext = () => {
@@ -63,7 +40,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try {
       audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 64; // Small for performance, gives us 32 frequency bins
+      analyserRef.current.fftSize = 64;
       analyserRef.current.smoothingTimeConstant = 0.8;
       
       sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
@@ -75,28 +52,80 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // Create audio element on client side
+    audioRef.current = new Audio("/Drip - Corbin Roe, Mayne & NicXIX.mp3");
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.2;
+    audioRef.current.crossOrigin = "anonymous";
+    
+    // Add event listeners for play state
+    const audio = audioRef.current;
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    
+    // Enable audio on first user interaction anywhere on page
+    const enableAudioOnInteraction = () => {
+      if (!audioEnabledRef.current) {
+        audioEnabledRef.current = true;
+        // If we're already in dark mode (from scroll), start playing
+        if (!isMutedRef.current && audioRef.current) {
+          initAudioContext();
+          if (audioContextRef.current?.state === "suspended") {
+            audioContextRef.current.resume();
+          }
+          audioRef.current.play().catch(() => {});
+        }
+      }
+    };
+    
+    document.addEventListener("click", enableAudioOnInteraction, { once: true });
+    document.addEventListener("touchstart", enableAudioOnInteraction, { once: true });
+    
+    return () => {
+      if (audio) {
+        audio.removeEventListener("play", handlePlay);
+        audio.removeEventListener("pause", handlePause);
+        audio.pause();
+      }
+      document.removeEventListener("click", enableAudioOnInteraction);
+      document.removeEventListener("touchstart", enableAudioOnInteraction);
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      audioRef.current = null;
+      audioContextRef.current = null;
+      analyserRef.current = null;
+      sourceRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
     if (audioRef.current) {
       if (!isMuted) {
-        // Initialize audio context on first unmute (requires user interaction)
-        initAudioContext();
-        
-        // Resume audio context if suspended
-        if (audioContextRef.current?.state === "suspended") {
-          audioContextRef.current.resume();
+        // Only try to play if audio has been enabled by user interaction
+        if (audioEnabledRef.current) {
+          initAudioContext();
+          if (audioContextRef.current?.state === "suspended") {
+            audioContextRef.current.resume();
+          }
+          audioRef.current.play().catch(() => {});
         }
-        
-        // Play music when unmuted
-        audioRef.current.play().catch(() => {
-          // Browser may block autoplay, that's okay
-        });
       } else {
-        // Pause when muted
         audioRef.current.pause();
       }
     }
   }, [isMuted]);
 
-  const toggleMute = () => setIsMuted((prev) => !prev);
+  const toggleMute = () => {
+    audioEnabledRef.current = true; // User clicked, so enable audio
+    setIsMuted((prev) => !prev);
+  };
+  
+  // Set theme (for scroll-triggered changes)
+  const setTheme = (muted: boolean) => setIsMuted(muted);
   
   const setVolume = (newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
@@ -109,17 +138,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const togglePlay = () => {
     if (!audioRef.current || isMuted) return;
     
+    // Ensure audio is enabled and context is initialized
+    audioEnabledRef.current = true;
+    initAudioContext();
+    if (audioContextRef.current?.state === "suspended") {
+      audioContextRef.current.resume();
+    }
+    
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(() => {
-        // Browser may block autoplay
-      });
+      audioRef.current.play().catch(() => {});
     }
   };
 
   return (
-    <ThemeContext.Provider value={{ isMuted, isPlaying, toggleMute, togglePlay, songName, analyserRef, volume, setVolume }}>
+    <ThemeContext.Provider value={{ isMuted, isPlaying, toggleMute, togglePlay, setTheme, songName, analyserRef, volume, setVolume }}>
       <div className={`theme-wrapper transition-all duration-700 ${isMuted ? "theme-muted" : "theme-unmuted"}`}>
         {children}
       </div>
