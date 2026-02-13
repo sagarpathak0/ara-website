@@ -36,11 +36,11 @@ export default function JoinSection() {
       const data = await response.json();
 
       if (data.success) {
-        setStatus({ type: "success", message: data.message });
+        setStatus({ type: "success", message: "Welcome to the Alliance. Check your inbox." });
         setAlias("");
         setEmail("");
       } else {
-        setStatus({ type: "error", message: data.error });
+        setStatus({ type: "error", message: data.error || "Request failed. Please try again." });
       }
     } catch {
       setStatus({ type: "error", message: "Connection failed. Please try again later." });
