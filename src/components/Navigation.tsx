@@ -6,15 +6,16 @@ import { useEffect, useRef } from "react";
 import { useTheme } from "./ThemeContext";
 
 export default function Navigation() {
-  const { isMuted, toggleMute, setTheme } = useTheme();
+  const { isMuted, toggleMute, setTheme, enableAudioFromGesture } = useTheme();
   const hasScrolled = useRef(false);
 
-  // Auto-switch to dark mode on first scroll only (without audio)
+  // Auto-switch to dark mode on first scroll and start audio
   useEffect(() => {
     const handleScroll = () => {
       if (!hasScrolled.current && isMuted) {
         hasScrolled.current = true;
-        setTheme(false); // Switch to dark mode without playing audio
+        setTheme(false);
+        enableAudioFromGesture();
       }
     };
 

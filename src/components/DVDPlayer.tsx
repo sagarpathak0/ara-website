@@ -5,10 +5,11 @@ import { useTheme } from "./ThemeContext";
 import { useEffect, useState, useRef, useCallback } from "react";
 
 export default function DVDPlayer() {
-  const { isMuted, isPlaying, togglePlay, songName, analyserRef, volume, setVolume } = useTheme();
+  const { isMuted, isPlaying, togglePlay, enableAudioFromGesture, songName, analyserRef, volume, setVolume } = useTheme();
   const [frequencyData, setFrequencyData] = useState<number[]>(Array(24).fill(0));
   const animationRef = useRef<number | undefined>(undefined);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [hasAcknowledgedAudio, setHasAcknowledgedAudio] = useState(false);
 
   // Update frequency data from analyser
   const updateFrequency = useCallback(() => {
@@ -47,6 +48,14 @@ export default function DVDPlayer() {
     };
   }, [isMuted, updateFrequency]);
 
+  useEffect(() => {
+    window.localStorage.removeItem("ara_audio_unlocked");
+    const stored = window.localStorage.getItem("ara_audio_unlocked");
+    if (stored === "true") {
+      setHasAcknowledgedAudio(true);
+    }
+  }, []);
+
   // Only show in unmuted state
   if (isMuted) return null;
 
@@ -72,6 +81,25 @@ export default function DVDPlayer() {
     >
       {/* Song name label - only visible when playing */}
       <AnimatePresence>
+        {!hasAcknowledgedAudio && !isPlaying && (
+          <motion.button
+            onClick={() => {
+              enableAudioFromGesture();
+              setHasAcknowledgedAudio(true);
+              window.localStorage.setItem("ara_audio_unlocked", "true");
+            }}
+            className="hidden sm:flex bg-black/70 backdrop-blur-md border border-[#FF4E4E]/40 rounded-lg px-3 py-1.5 md:px-4 md:py-2 max-w-[180px] items-center gap-2 shadow-[0_0_12px_rgba(255,78,78,0.25)]"
+            initial={{ opacity: 0, x: 40, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 40, scale: 0.8 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <span className="material-symbols-outlined text-[#FF4E4E] text-sm">volume_up</span>
+            <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-widest text-[#FF4E4E]">
+              Click to enable sound
+            </span>
+          </motion.button>
+        )}
         {isPlaying && (
           <motion.div
             className="hidden sm:block bg-black/60 backdrop-blur-md border border-white/10 rounded-lg px-3 py-1.5 md:px-4 md:py-2 max-w-[140px] md:max-w-[180px]"

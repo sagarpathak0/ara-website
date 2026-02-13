@@ -8,6 +8,7 @@ type ThemeContextType = {
   toggleMute: () => void;
   togglePlay: () => void;
   setTheme: (muted: boolean) => void;
+  enableAudioFromGesture: () => void;
   songName: string;
   analyserRef: React.RefObject<AnalyserNode | null>;
   volume: number;
@@ -53,45 +54,53 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Create audio element on client side
-    audioRef.current = new Audio("/Drip - Corbin Roe, Mayne & NicXIX.mp3");
+    const audioSrc = "/Drip - Corbin Roe, Mayne & NicXIX.mp3";
+    audioRef.current = new Audio(encodeURI(audioSrc));
     audioRef.current.loop = true;
     audioRef.current.volume = 0.2;
     audioRef.current.crossOrigin = "anonymous";
+    audioRef.current.preload = "auto";
     
     // Add event listeners for play state
     const audio = audioRef.current;
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+    const handleError = () => {
+      const error = audio.error?.message || "unknown audio error";
+      console.warn("Audio load error:", error);
+    };
     
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
+    audio.addEventListener("error", handleError);
     
     // Enable audio on first user interaction anywhere on page
     const enableAudioOnInteraction = () => {
       if (!audioEnabledRef.current) {
-        audioEnabledRef.current = true;
-        // If we're already in dark mode (from scroll), start playing
-        if (!isMutedRef.current && audioRef.current) {
-          initAudioContext();
-          if (audioContextRef.current?.state === "suspended") {
-            audioContextRef.current.resume();
-          }
-          audioRef.current.play().catch(() => {});
-        }
+        enableAudioFromGesture();
       }
     };
     
     document.addEventListener("click", enableAudioOnInteraction, { once: true });
     document.addEventListener("touchstart", enableAudioOnInteraction, { once: true });
+    document.addEventListener("pointerdown", enableAudioOnInteraction, { once: true });
+    document.addEventListener("wheel", enableAudioOnInteraction, { once: true, passive: true });
+    window.addEventListener("scroll", enableAudioOnInteraction, { once: true, passive: true });
+    document.addEventListener("keydown", enableAudioOnInteraction, { once: true });
     
     return () => {
       if (audio) {
         audio.removeEventListener("play", handlePlay);
         audio.removeEventListener("pause", handlePause);
+        audio.removeEventListener("error", handleError);
         audio.pause();
       }
       document.removeEventListener("click", enableAudioOnInteraction);
       document.removeEventListener("touchstart", enableAudioOnInteraction);
+      document.removeEventListener("pointerdown", enableAudioOnInteraction);
+      document.removeEventListener("wheel", enableAudioOnInteraction);
+      window.removeEventListener("scroll", enableAudioOnInteraction);
+      document.removeEventListener("keydown", enableAudioOnInteraction);
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
@@ -126,6 +135,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   
   // Set theme (for scroll-triggered changes)
   const setTheme = (muted: boolean) => setIsMuted(muted);
+
+  // Start audio in direct response to a user gesture (scroll/click/etc.)
+  const enableAudioFromGesture = () => {
+    audioEnabledRef.current = true;
+    if (audioRef.current) {
+      initAudioContext();
+      if (audioContextRef.current?.state === "suspended") {
+        audioContextRef.current.resume();
+      }
+      audioRef.current.play().catch((error) => {
+        console.warn("Audio play blocked:", error);
+      });
+    }
+    setIsMuted(false);
+  };
   
   const setVolume = (newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
@@ -153,7 +177,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ isMuted, isPlaying, toggleMute, togglePlay, setTheme, songName, analyserRef, volume, setVolume }}>
+    <ThemeContext.Provider value={{ isMuted, isPlaying, toggleMute, togglePlay, setTheme, enableAudioFromGesture, songName, analyserRef, volume, setVolume }}>
       <div className={`theme-wrapper transition-all duration-700 ${isMuted ? "theme-muted" : "theme-unmuted"}`}>
         {children}
       </div>
