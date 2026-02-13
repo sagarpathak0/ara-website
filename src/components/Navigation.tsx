@@ -21,7 +21,16 @@ export default function Navigation() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMuted, setTheme]);
+  }, [enableAudioFromGesture, isMuted, setTheme]);
+
+  const handleMicClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (isMuted) {
+      enableAudioFromGesture();
+      return;
+    }
+    toggleMute();
+  };
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -59,7 +68,7 @@ export default function Navigation() {
         {/* Center Mic Toggle - THE MAIN TOGGLE */}
         <div className="relative mx-2 flex items-center justify-center">
           <motion.button
-            onClick={toggleMute}
+            onClick={handleMicClick}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 relative overflow-hidden ${
               isMuted
                 ? "bg-[#FF4E4E] text-white shadow-[0_0_20px_rgba(255,78,78,0.5)]"

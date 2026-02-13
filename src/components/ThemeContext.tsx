@@ -74,20 +74,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     audio.addEventListener("pause", handlePause);
     audio.addEventListener("error", handleError);
     
-    // Enable audio on first user interaction anywhere on page
-    const enableAudioOnInteraction = () => {
-      if (!audioEnabledRef.current) {
-        enableAudioFromGesture();
-      }
-    };
-    
-    document.addEventListener("click", enableAudioOnInteraction, { once: true });
-    document.addEventListener("touchstart", enableAudioOnInteraction, { once: true });
-    document.addEventListener("pointerdown", enableAudioOnInteraction, { once: true });
-    document.addEventListener("wheel", enableAudioOnInteraction, { once: true, passive: true });
-    window.addEventListener("scroll", enableAudioOnInteraction, { once: true, passive: true });
-    document.addEventListener("keydown", enableAudioOnInteraction, { once: true });
-    
     return () => {
       if (audio) {
         audio.removeEventListener("play", handlePlay);
@@ -95,12 +81,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         audio.removeEventListener("error", handleError);
         audio.pause();
       }
-      document.removeEventListener("click", enableAudioOnInteraction);
-      document.removeEventListener("touchstart", enableAudioOnInteraction);
-      document.removeEventListener("pointerdown", enableAudioOnInteraction);
-      document.removeEventListener("wheel", enableAudioOnInteraction);
-      window.removeEventListener("scroll", enableAudioOnInteraction);
-      document.removeEventListener("keydown", enableAudioOnInteraction);
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
